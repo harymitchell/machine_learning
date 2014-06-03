@@ -55,7 +55,7 @@ feature -- Access
 	information_gain: REAL_64
 			-- Information gained from using Current.
 		do
-			Result := (decision_tree.set_entropy) - attribute_entropy_summation
+			Result := (decision_tree.entropy_for_set) - attribute_entropy_summation
 		end
 
 feature -- Status Report
