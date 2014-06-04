@@ -17,13 +17,9 @@ feature {NONE} -- Initialization
 
 	make_and_launch
 			-- Initialize and launch application
-		local
-			l_decision_tree: DECISION_TREE
 		do
 			default_create
 			prepare
-			create l_decision_tree
-			l_decision_tree.test_decision_tree
 			launch
 		end
 
@@ -36,7 +32,7 @@ feature {NONE} -- Initialization
 			create first_window
 
 				-- Show the first window.
---			first_window.show
+			first_window.show
 		end
 
 feature {NONE} -- Implementation
