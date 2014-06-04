@@ -52,10 +52,10 @@ feature -- Access
 			Result := values_from_data.at (a_index)
 		end
 
-	information_gain: REAL_64
+	information_gain: REAL_32
 			-- Information gained from using Current.
 		do
-			Result := (decision_tree.set_entropy) - attribute_entropy_summation
+			Result := (decision_tree.entropy_for_set) - attribute_entropy_summation
 		end
 
 feature -- Status Report
@@ -76,11 +76,15 @@ feature -- Basic Operations
 			-- Extends a value into the training data.
 		do
 			values_from_data.extend (a_value)
+		ensure
+			string_values_contained_in_labels: across values_from_data as ic_result all
+												across labels as ic_labels some are_labels_the_same (ic_labels.item, ic_result.item) end
+											   end
 		end
 
 feature {NONE} -- Implementation
 
-	attribute_entropy_summation: REAL_64
+	attribute_entropy_summation: REAL_32
 		local
 			l_count_tuple: like positive_negative_count_tuple
 			l_total_count_for_label: INTEGER
@@ -88,7 +92,7 @@ feature {NONE} -- Implementation
 			across labels as ic_labels loop
 				l_count_tuple := positive_negative_count_for_label (ic_labels.item)
 				l_total_count_for_label := l_count_tuple.positive_count + l_count_tuple.negative_count
-				Result := Result + ( ( (l_total_count_for_label / decision_tree.results.count) * (entropy_of (l_count_tuple.positive_count, l_count_tuple.negative_count))))
+				Result := Result + ( ( (l_total_count_for_label / decision_tree.results.count) * (entropy_of (l_count_tuple.positive_count, l_count_tuple.negative_count)))).truncated_to_real
 			end
 		end
 
@@ -108,8 +112,6 @@ feature {NONE} -- Implementation
 			-- List of label values for Current training set.
 		attribute
 			create Result.make (0)
-		ensure
-			string_values_contained_in_labels: across Result as ic_result all labels.has (ic_result.item) end
 		end
 
 	positive_negative_count_tuple: detachable TUPLE [positive_count, negative_count: INTEGER]

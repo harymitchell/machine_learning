@@ -39,7 +39,7 @@ feature -- Access
 			Result := results.count - positive_outcome_count
 		end
 
-	set_entropy: REAL_64
+	entropy_for_set: REAL_32
 			-- Entropy for Current.
 		do
 			Result := entropy_of (positive_outcome_count, negative_outcome_count)
@@ -54,7 +54,7 @@ feature -- Test
 			l_wind_att: DECISION_TREE_ATTRIBUTE [STRING_32]
 			l_temp_att: DECISION_TREE_ATTRIBUTE [STRING_32]
 		do
-			create l_outlook_att.make ("outlook", <<"sunny", "overcast", "raining">>, Current)
+			create l_outlook_att.make ("outlook", <<"sunny", "overcast", "rain">>, Current)
 			create l_humidity_att.make ("humidity", <<0,1>>, Current)
 			create l_wind_att.make ("wind", <<"strong", "weak">>, Current)
 			create l_temp_att.make ("temp", <<"hot", "mild", "cool">>, Current)
@@ -136,7 +136,7 @@ feature -- Test
 
 			check l_humidity_att.values_count = results.count and then  l_outlook_att.values_count = results.count  and then  l_temp_att.values_count = results.count  and then  l_wind_att.values_count = results.count end
 
-			set_entropy.do_nothing
+			entropy_for_set.do_nothing
 
 			l_temp_att.information_gain.do_nothing
 			l_wind_att.information_gain.do_nothing
