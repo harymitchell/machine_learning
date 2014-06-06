@@ -6,18 +6,36 @@ note
 
 class
 	DECISION_TREE
+
 inherit
 	ML_FORMULA
+
+create
+	default_create,
+	make_with_csv_file_path
+
+feature -- Init
+
+	make_with_csv_file_path (a_file_path: STRING_32)
+		do
+			parse_data_file (a_file_path)
+		end
 
 feature -- Access: Training Set
 
 	results: ARRAYED_LIST [BOOLEAN]
-			-- Results of Current training data.
+			-- Results of Current training data synthesized to {BOOLEAN.
 		attribute
 			create Result.make (0)
 		end
 
-	attributes: ARRAYED_LIST [DECISION_TREE_ATTRIBUTE [ANY]]
+	raw_results: ARRAYED_LIST [ANY]
+			-- Raw results of Current training data.
+		attribute
+			create Result.make (0)
+		end
+
+	attributes: ARRAYED_LIST [DECISION_TREE_ATTRIBUTE [READABLE_STRING_GENERAL]]
 			-- Attributes for Current system.
 		attribute
 			create Result.make (0)
@@ -39,116 +57,51 @@ feature -- Access: Training Set
 			Result := results.count - positive_outcome_count
 		end
 
-<<<<<<< HEAD
 	entropy_for_set: REAL_32
-=======
-	entropy_for_set: REAL_64
->>>>>>> 471d4e9d9f3ced4aad8c1cfd69fac22956536293
 			-- Entropy for Current.
 		do
 			Result := entropy_of (positive_outcome_count, negative_outcome_count)
 		end
 
-<<<<<<< HEAD
-feature -- Test
+feature -- Imp
 
-	test_decision_tree
+	parse_data_file (a_path_string: STRING_32)
 		local
-			l_outlook_att: DECISION_TREE_ATTRIBUTE [STRING_32]
-			l_humidity_att: DECISION_TREE_ATTRIBUTE [INTEGER_32]
-			l_wind_att: DECISION_TREE_ATTRIBUTE [STRING_32]
-			l_temp_att: DECISION_TREE_ATTRIBUTE [STRING_32]
+			l_file: PLAIN_TEXT_FILE
+			l_text: STRING_32
+			l_lines, l_data_points: LIST [STRING_32]
+			l_attribute: DECISION_TREE_ATTRIBUTE [READABLE_STRING_GENERAL]
+			l_data_point_count, l_attribute_count: INTEGER
 		do
-			create l_outlook_att.make ("outlook", <<"sunny", "overcast", "rain">>, Current)
-			create l_humidity_att.make ("humidity", <<0,1>>, Current)
-			create l_wind_att.make ("wind", <<"strong", "weak">>, Current)
-			create l_temp_att.make ("temp", <<"hot", "mild", "cool">>, Current)
+			-- Get text.
+			create l_file.make_open_read (a_path_string)
+			l_file.read_stream (l_file.count)
+			l_text := l_file.last_string
+			l_file.close
 
-			results.extend (False)
-			results.extend (False)
-			results.extend (True)
-			results.extend (True)
-			results.extend (True)
-			results.extend (False)
-			results.extend (True)
-			results.extend (False)
-			results.extend (True)
-			results.extend (True)
-			results.extend (True)
-			results.extend (True)
-			results.extend (True)
-			results.extend (False)
+			-- Parse text.
+			l_lines := l_text.split ('%N')
 
-			l_outlook_att.extend_to_training_data ("sunny")
-			l_outlook_att.extend_to_training_data ("sunny")
-			l_outlook_att.extend_to_training_data ("overcast")
-			l_outlook_att.extend_to_training_data ("rain")
-			l_outlook_att.extend_to_training_data ("rain")
-			l_outlook_att.extend_to_training_data ("rain")
-			l_outlook_att.extend_to_training_data ("overcast")
-			l_outlook_att.extend_to_training_data ("sunny")
-			l_outlook_att.extend_to_training_data ("sunny")
-			l_outlook_att.extend_to_training_data ("rain")
-			l_outlook_att.extend_to_training_data ("sunny")
-			l_outlook_att.extend_to_training_data ("overcast")
-			l_outlook_att.extend_to_training_data ("overcast")
-			l_outlook_att.extend_to_training_data ("rain")
+			l_data_point_count := l_lines.at (1).split (' ').count
+			l_attribute_count := l_data_point_count - 1
 
-			l_humidity_att.extend_to_training_data (1)
-			l_humidity_att.extend_to_training_data (1)
-			l_humidity_att.extend_to_training_data (1)
-			l_humidity_att.extend_to_training_data (1)
-			l_humidity_att.extend_to_training_data (0)
-			l_humidity_att.extend_to_training_data (0)
-			l_humidity_att.extend_to_training_data (0)
-			l_humidity_att.extend_to_training_data (1)
-			l_humidity_att.extend_to_training_data (0)
-			l_humidity_att.extend_to_training_data (0)
-			l_humidity_att.extend_to_training_data (0)
-			l_humidity_att.extend_to_training_data (1)
-			l_humidity_att.extend_to_training_data (0)
-			l_humidity_att.extend_to_training_data (1)
+			across 1|..| l_attribute_count as ic_index loop
+				create l_attribute.make ("attribute" + " " + ic_index.item.out, <<>>, Current)
+				attributes.extend (l_attribute)
+			end
 
-			l_wind_att.extend_to_training_data ("weak")
-			l_wind_att.extend_to_training_data ("strong")
-			l_wind_att.extend_to_training_data ("weak")
-			l_wind_att.extend_to_training_data ("weak")
-			l_wind_att.extend_to_training_data ("weak")
-			l_wind_att.extend_to_training_data ("strong")
-			l_wind_att.extend_to_training_data ("strong")
-			l_wind_att.extend_to_training_data ("weak")
-			l_wind_att.extend_to_training_data ("weak")
-			l_wind_att.extend_to_training_data ("weak")
-			l_wind_att.extend_to_training_data ("strong")
-			l_wind_att.extend_to_training_data ("strong")
-			l_wind_att.extend_to_training_data ("weak")
-			l_wind_att.extend_to_training_data ("strong")
-
-			l_temp_att.extend_to_training_data ("hot")
-			l_temp_att.extend_to_training_data ("hot")
-			l_temp_att.extend_to_training_data ("hot")
-			l_temp_att.extend_to_training_data ("mild")
-			l_temp_att.extend_to_training_data ("cool")
-			l_temp_att.extend_to_training_data ("cool")
-			l_temp_att.extend_to_training_data ("cool")
-			l_temp_att.extend_to_training_data ("mild")
-			l_temp_att.extend_to_training_data ("cool")
-			l_temp_att.extend_to_training_data ("mild")
-			l_temp_att.extend_to_training_data ("mild")
-			l_temp_att.extend_to_training_data ("mild")
-			l_temp_att.extend_to_training_data ("hot")
-			l_temp_att.extend_to_training_data ("mild")
-
-			check l_humidity_att.values_count = results.count and then  l_outlook_att.values_count = results.count  and then  l_temp_att.values_count = results.count  and then  l_wind_att.values_count = results.count end
-
-			entropy_for_set.do_nothing
-
-			l_temp_att.information_gain.do_nothing
-			l_wind_att.information_gain.do_nothing
-			l_outlook_att.information_gain.do_nothing
-			l_humidity_att.information_gain.do_nothing
+			across l_lines as ic_lines loop
+				l_data_points := ic_lines.item.split (' ')
+				if l_data_points.count = l_data_point_count then
+					across 1|..| l_data_point_count as ic_index loop
+						if ic_index.item = l_data_point_count then
+							raw_results.extend (l_data_points.at (ic_index.item))
+						else
+							attributes.at (ic_index.item).extend_to_training_data (l_data_points.at (ic_index.item))
+						end
+					end
+				end
+			end
 		end
 
-=======
->>>>>>> 471d4e9d9f3ced4aad8c1cfd69fac22956536293
 end
